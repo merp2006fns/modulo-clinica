@@ -1,0 +1,17 @@
+RewriteEngine On
+RewriteBase /
+
+# Headers CORS
+Header always set Access-Control-Allow-Origin "http://localhost:5173"
+header("Access-Control-Allow-Credentials: true");
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+
+# Manejar preflight CORS
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ - [R=200,L]
+
+# Redirigir todo al index.php (excepto archivos existentes)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
