@@ -118,14 +118,6 @@ abstract class BaseModel
         }
     }
 
-    public function softDeleteById(int $id)
-    {
-        if (in_array('activo', $this->campos)) {
-            return $this->updateById($id, ['activo' => false]);
-        }
-        return $this->deleteById($id);
-    }
-
     public function count($conditions = [])
     {
         $sql = "SELECT COUNT(*) as total FROM {$this->table}";
@@ -142,5 +134,59 @@ abstract class BaseModel
 
         $result = $this->query($sql, $params);
         return $result[0]['total'];
+    }
+
+    public function buscarByTermino($termino, $camposBusqueda = [], $exacto = false, $conditions = [], $orderBy = '')
+    {
+        if (empty($termino)) {
+            return $this->getAll($conditions, $orderBy);
+        }
+
+        if (empty($camposBusqueda)) {
+            $camposBusqueda = $this->campos;
+        }
+
+        $camposValidos = array_intersect($camposBusqueda, $this->campos);
+
+        if (empty($camposValidos)) {
+            throw new Exception("No hay campos válidos para búsqueda");
+        }
+
+        $whereParts = [];
+        $params = [];
+
+        if (!empty($conditions)) {
+            foreach ($conditions as $key => $value) {
+                $whereParts[] = "$key = :cond_$key";
+                $params["cond_$key"] = $value;
+            }
+        }
+
+        $busquedaParts = [];
+        foreach ($camposValidos as $campo) {
+            if ($exacto) {
+                $busquedaParts[] = "$campo = :busq_$campo";
+                $params["busq_$campo"] = $termino;
+            } else {
+                $busquedaParts[] = "$campo LIKE :busq_$campo";
+                $params["busq_$campo"] = "%$termino%";
+            }
+        }
+
+        if (!empty($busquedaParts)) {
+            $whereParts[] = "(" . implode(' OR ', $busquedaParts) . ")";
+        }
+
+        $sql = "SELECT * FROM {$this->table}";
+
+        if (!empty($whereParts)) {
+            $sql .= " WHERE " . implode(' AND ', $whereParts);
+        }
+
+        if ($orderBy) {
+            $sql .= " ORDER BY $orderBy";
+        }
+
+        return $this->query($sql, $params);
     }
 }
