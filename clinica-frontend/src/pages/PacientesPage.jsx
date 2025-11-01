@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const API_URL = "http://localhost:8080";
@@ -23,11 +23,7 @@ export const PacientesPage = () => {
   const canEdit = ["admin", "recepcion"].includes(user?.rol);
   const canDelete = user?.rol === "admin";
 
-  useEffect(() => {
-    fetchPacientes();
-  }, [page, search]);
-
-  const fetchPacientes = async () => {
+  const fetchPacientes = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -54,7 +50,11 @@ export const PacientesPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, search]);
+
+  useEffect(() => {
+    fetchPacientes();
+  }, [page, search, fetchPacientes]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -135,19 +135,26 @@ export const PacientesPage = () => {
   };
 
   return (
-    <div>
+    <div className="container mx-auto px-2 sm:px-4 py-6">
       <h1>Gestión de Pacientes</h1>
-
       {error && <p style={{ color: "red" }}>{error}</p>}
-
       {canCreate && (
-        <button onClick={() => setShowForm(true)}>Nuevo Paciente</button>
+        <button
+          className="mb-4 w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+          onClick={() => setShowForm(true)}
+        >
+          Nuevo Paciente
+        </button>
       )}
-
       {showForm && canCreate && (
-        <div>
-          <h2>{editId ? "Editar" : "Nuevo"} Paciente</h2>
-          <form onSubmit={handleSubmit}>
+        <div className="mb-6">
+          <h2 className="text-xl font-bold mb-4">
+            {editId ? "Editar" : "Nuevo"} Paciente
+          </h2>
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
             <div>
               <label>Nombre:</label>
               <input
@@ -157,6 +164,7 @@ export const PacientesPage = () => {
                   setFormData({ ...formData, nombre: e.target.value })
                 }
                 required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
             <div>
@@ -168,9 +176,10 @@ export const PacientesPage = () => {
                   setFormData({ ...formData, telefono: e.target.value })
                 }
                 required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
-            <div>
+            <div className="md:col-span-2">
               <label>Correo:</label>
               <input
                 type="email"
@@ -179,17 +188,28 @@ export const PacientesPage = () => {
                   setFormData({ ...formData, correo: e.target.value })
                 }
                 required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
-            <button type="submit">Guardar</button>
-            <button type="button" onClick={handleCancelForm}>
-              Cancelar
-            </button>
+            <div className="md:col-span-2 flex gap-2">
+              <button
+                type="submit"
+                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              >
+                Guardar
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelForm}
+                className="bg-gray-400 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              >
+                Cancelar
+              </button>
+            </div>
           </form>
         </div>
       )}
-
-      <div>
+      <div className="mb-6">
         <input
           type="text"
           placeholder="Buscar pacientes..."
@@ -198,43 +218,66 @@ export const PacientesPage = () => {
             setSearch(e.target.value);
             setPage(1);
           }}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
         />
       </div>
-
       {loading ? (
         <p>Cargando...</p>
       ) : (
-        <>
-          <table>
-            <thead>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+            <thead className="bg-green-500 text-white dark:bg-green-700">
               <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Teléfono</th>
-                <th>Correo</th>
-                <th>Fecha Registro</th>
-                {canEdit && <th>Acciones</th>}
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  ID
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Nombre
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Teléfono
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Correo
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Fecha Registro
+                </th>
+                {canEdit && (
+                  <th className="px-4 py-3 text-left text-sm font-semibold">
+                    Acciones
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
               {pacientes.map((paciente) => (
-                <tr key={paciente.id}>
-                  <td>{paciente.id}</td>
-                  <td>{paciente.nombre}</td>
-                  <td>{paciente.telefono}</td>
-                  <td>{paciente.correo}</td>
-                  <td>
+                <tr
+                  key={paciente.id}
+                  className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                >
+                  <td className="px-4 py-3 text-sm">{paciente.id}</td>
+                  <td className="px-4 py-3 text-sm">{paciente.nombre}</td>
+                  <td className="px-4 py-3 text-sm">{paciente.telefono}</td>
+                  <td className="px-4 py-3 text-sm">{paciente.correo}</td>
+                  <td className="px-4 py-3 text-sm">
                     {paciente.fecha_registro
                       ? new Date(paciente.fecha_registro).toLocaleDateString()
                       : "-"}
                   </td>
                   {canEdit && (
-                    <td>
-                      <button onClick={() => handleEdit(paciente)}>
+                    <td className="px-4 py-3 text-sm">
+                      <button
+                        className="mr-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md"
+                        onClick={() => handleEdit(paciente)}
+                      >
                         Editar
                       </button>
                       {canDelete && (
-                        <button onClick={() => handleDelete(paciente.id)}>
+                        <button
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"
+                          onClick={() => handleDelete(paciente.id)}
+                        >
                           Eliminar
                         </button>
                       )}
@@ -244,28 +287,29 @@ export const PacientesPage = () => {
               ))}
             </tbody>
           </table>
-
-          {pagination && (
-            <div>
-              <button
-                disabled={!pagination.has_prev}
-                onClick={() => setPage(page - 1)}
-              >
-                Anterior
-              </button>
-              <span>
-                Página {pagination.current_page} de {pagination.total_pages}{" "}
-                (Total: {pagination.total})
-              </span>
-              <button
-                disabled={!pagination.has_next}
-                onClick={() => setPage(page + 1)}
-              >
-                Siguiente
-              </button>
-            </div>
-          )}
-        </>
+        </div>
+      )}
+      {pagination && (
+        <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-2">
+          <button
+            disabled={!pagination.has_prev}
+            onClick={() => setPage(page - 1)}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            Anterior
+          </button>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Página {pagination.current_page} de {pagination.total_pages} (Total:{" "}
+            {pagination.total})
+          </span>
+          <button
+            disabled={!pagination.has_next}
+            onClick={() => setPage(page + 1)}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            Siguiente
+          </button>
+        </div>
       )}
     </div>
   );

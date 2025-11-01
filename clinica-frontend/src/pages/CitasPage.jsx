@@ -301,61 +301,71 @@ export const CitasPage = () => {
   };
 
   return (
-    <div>
+    <div className="container mx-auto px-2 sm:px-4 py-6">
       <h1>Gestión de Citas</h1>
-
       {error && <p style={{ color: "red" }}>{error}</p>}
-
       {canCreate && (
-        <button onClick={() => setShowForm(true)}>Nueva Cita</button>
+        <button
+          className="mb-4 w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+          onClick={() => setShowForm(true)}
+        >
+          Nueva Cita
+        </button>
       )}
-
-      {showForm && canCreate && (
-        <div>
-          <h2>{editId ? "Editar" : "Nueva"} Cita</h2>
-          <form onSubmit={handleSubmit}>
-            <SearchSelect
-              onSearch={searchPacientes}
-              onChange={(value) =>
-                setFormData({ ...formData, paciente_id: value })
-              }
-              value={formData.paciente_id}
-              placeholder="Buscar paciente..."
-              name="paciente_id"
-              id="paciente_id"
-              minSearchLength={2}
-              debounceMs={500}
-              initialOptions={pacientes}
-            />
-
-            <SearchSelect
-              onSearch={searchServicios}
-              onChange={(value) =>
-                setFormData({ ...formData, servicio_id: value })
-              }
-              value={formData.servicio_id}
-              placeholder="Buscar servicio..."
-              name="servicio_id"
-              id="servicio_id"
-              minSearchLength={2}
-              debounceMs={500}
-              initialOptions={servicios}
-            />
-
-            <SearchSelect
-              onSearch={searchMedicos}
-              onChange={(value) =>
-                setFormData({ ...formData, medico_usuario_id: value })
-              }
-              value={formData.medico_usuario_id}
-              placeholder="Buscar médico..."
-              name="medico_usuario_id"
-              id="medico_usuario_id"
-              minSearchLength={2}
-              debounceMs={500}
-              initialOptions={medicos}
-            />
-
+      {showForm && (editId ? canEdit : canCreate) && (
+        <div className="mb-6">
+          <h2 className="text-xl font-bold mb-4">{editId ? "Editar" : "Nueva"} Cita</h2>
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            <div>
+              <SearchSelect
+                onSearch={searchPacientes}
+                onChange={(value) =>
+                  setFormData({ ...formData, paciente_id: value })
+                }
+                value={formData.paciente_id}
+                placeholder="Buscar paciente..."
+                name="paciente_id"
+                id="paciente_id"
+                minSearchLength={2}
+                debounceMs={500}
+                initialOptions={pacientes}
+                enabled={formData.medico_usuario_id !== user?.id}
+              />
+            </div>
+            <div>
+              <SearchSelect
+                onSearch={searchServicios}
+                onChange={(value) =>
+                  setFormData({ ...formData, servicio_id: value })
+                }
+                value={formData.servicio_id}
+                placeholder="Buscar servicio..."
+                name="servicio_id"
+                id="servicio_id"
+                minSearchLength={2}
+                debounceMs={500}
+                initialOptions={servicios}
+              />
+            </div>
+            <div>
+              <SearchSelect
+                onSearch={searchMedicos}
+                onChange={(value) =>
+                  setFormData({ ...formData, medico_usuario_id: value })
+                }
+                value={formData.medico_usuario_id}
+                placeholder="Buscar médico..."
+                name="medico_usuario_id"
+                id="medico_usuario_id"
+                minSearchLength={2}
+                debounceMs={500}
+                initialOptions={medicos}
+                enabled={formData.medico_usuario_id !== user?.id}
+              />
+            </div>
             <div>
               <label>Fecha y Hora:</label>
               <input
@@ -365,6 +375,7 @@ export const CitasPage = () => {
                   setFormData({ ...formData, fecha_hora: e.target.value })
                 }
                 required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
             <div>
@@ -376,6 +387,7 @@ export const CitasPage = () => {
                     setFormData({ ...formData, estado: e.target.value })
                   }
                   required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option value="programada">Programada</option>
                   <option value="confirmada">Confirmada</option>
@@ -389,33 +401,39 @@ export const CitasPage = () => {
                   type="text"
                   value="Programada"
                   disabled
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    backgroundColor: "#f0f0f0",
-                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
                 />
               )}
             </div>
-            <div>
+            <div className="md:col-span-2">
               <label>Notas:</label>
               <textarea
                 value={formData.notas}
                 onChange={(e) =>
                   setFormData({ ...formData, notas: e.target.value })
                 }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
-            <button type="submit">Guardar</button>
-            <button type="button" onClick={handleCancelForm}>
-              Cancelar
-            </button>
+            <div className="md:col-span-2 flex gap-2">
+              <button
+                type="submit"
+                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              >
+                Guardar
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelForm}
+                className="bg-gray-400 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              >
+                Cancelar
+              </button>
+            </div>
           </form>
         </div>
       )}
-
-      <div>
-        <h3>Filtros</h3>
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <label>Estado:</label>
           <select
@@ -424,6 +442,7 @@ export const CitasPage = () => {
               setFiltros({ ...filtros, estado: e.target.value });
               setPage(1);
             }}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md"
           >
             <option value="">Todos</option>
             <option value="programada">Programada</option>
@@ -443,63 +462,92 @@ export const CitasPage = () => {
               setFiltros({ ...filtros, fecha: e.target.value });
               setPage(1);
             }}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md"
           />
         </div>
         <div>
-          <label>Buscar por término (paciente, médico, servicio, notas):</label>
+          <label>Buscar:</label>
           <input
             type="text"
             value={filtros.search}
-            onChange={(e) => {
-              setFiltros({ ...filtros, search: e.target.value });
-            }}
+            onChange={(e) => setFiltros({ ...filtros, search: e.target.value })}
             placeholder="Buscar citas..."
-            style={{ width: "100%", padding: "8px" }}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md"
           />
         </div>
       </div>
-
       {loading ? (
         <p>Cargando...</p>
       ) : (
-        <>
-          <table>
-            <thead>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+            <thead className="bg-green-500 text-white dark:bg-green-700">
               <tr>
-                <th>ID</th>
-                <th>Paciente</th>
-                <th>Servicio</th>
-                <th>Médico</th>
-                <th>Fecha/Hora</th>
-                <th>Estado</th>
-                <th>Notas</th>
-                {canEdit && <th>Acciones</th>}
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  ID
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Paciente
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Servicio
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Médico
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Fecha/Hora
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Estado
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Notas
+                </th>
+                {canEdit && (
+                  <th className="px-4 py-3 text-left text-sm font-semibold">
+                    Acciones
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
               {citas.map((cita) => (
-                <tr key={cita.id}>
-                  <td>{cita.id}</td>
-                  <td>
+                <tr
+                  key={cita.id}
+                  className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                >
+                  <td className="px-4 py-3 text-sm">{cita.id}</td>
+                  <td className="px-4 py-3 text-sm">
                     {cita.paciente_nombre} {cita.paciente_apellido}
                   </td>
-                  <td>{cita.servicio_nombre}</td>
-                  <td>
+                  <td className="px-4 py-3 text-sm">{cita.servicio_nombre}</td>
+                  <td className="px-4 py-3 text-sm">
                     {cita.medico_nombre} {cita.medico_apellido}
                   </td>
-                  <td>{new Date(cita.fecha_hora).toLocaleString()}</td>
-                  <td>{cita.estado}</td>
-                  <td>{cita.notas || "-"}</td>
+                  <td className="px-4 py-3 text-sm">
+                    {new Date(cita.fecha_hora).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3 text-sm">{cita.estado}</td>
+                  <td className="px-4 py-3 text-sm">{cita.notas || "-"}</td>
                   {canEdit && (
-                    <td>
+                    <td className="px-4 py-3 text-sm">
                       {(user?.rol === "admin" ||
                         user?.rol === "recepcion" ||
                         (user?.rol === "medico" &&
                           cita.medico_usuario_id == user?.id)) && (
-                        <button onClick={() => handleEdit(cita)}>Editar</button>
+                        <button
+                          className="mr-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md"
+                          onClick={() => handleEdit(cita)}
+                        >
+                          Editar
+                        </button>
                       )}
                       {canDelete && (
-                        <button onClick={() => handleDelete(cita.id)}>
+                        <button
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"
+                          onClick={() => handleDelete(cita.id)}
+                        >
                           Eliminar
                         </button>
                       )}
@@ -509,28 +557,29 @@ export const CitasPage = () => {
               ))}
             </tbody>
           </table>
-
-          {pagination && (
-            <div>
-              <button
-                disabled={!pagination.has_prev}
-                onClick={() => setPage(page - 1)}
-              >
-                Anterior
-              </button>
-              <span>
-                Página {pagination.current_page} de {pagination.total_pages}{" "}
-                (Total: {pagination.total})
-              </span>
-              <button
-                disabled={!pagination.has_next}
-                onClick={() => setPage(page + 1)}
-              >
-                Siguiente
-              </button>
-            </div>
-          )}
-        </>
+        </div>
+      )}
+      {pagination && (
+        <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-2">
+          <button
+            disabled={!pagination.has_prev}
+            onClick={() => setPage(page - 1)}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            Anterior
+          </button>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Página {pagination.current_page} de {pagination.total_pages} (
+            Total: {pagination.total})
+          </span>
+          <button
+            disabled={!pagination.has_next}
+            onClick={() => setPage(page + 1)}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            Siguiente
+          </button>
+        </div>
       )}
     </div>
   );

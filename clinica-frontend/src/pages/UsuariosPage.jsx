@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const API_URL = "http://localhost:8080";
@@ -23,11 +23,7 @@ export const UsuariosPage = () => {
 
   const canManage = user?.rol === "admin";
 
-  useEffect(() => {
-    fetchUsuarios();
-  }, [page, search, rolFilter]);
-
-  const fetchUsuarios = async () => {
+  const fetchUsuarios = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -55,7 +51,11 @@ export const UsuariosPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, search, rolFilter]);
+
+  useEffect(() => {
+    fetchUsuarios();
+  }, [page, search, rolFilter, fetchUsuarios]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -144,19 +144,26 @@ export const UsuariosPage = () => {
   };
 
   return (
-    <div>
+    <div className="container mx-auto px-2 sm:px-4 py-6">
       <h1>Gestión de Usuarios</h1>
-
       {error && <p style={{ color: "red" }}>{error}</p>}
-
       {canManage && (
-        <button onClick={() => setShowForm(true)}>Nuevo Usuario</button>
+        <button
+          className="mb-4 w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+          onClick={() => setShowForm(true)}
+        >
+          Nuevo Usuario
+        </button>
       )}
-
       {showForm && canManage && (
-        <div>
-          <h2>{editId ? "Editar" : "Nuevo"} Usuario</h2>
-          <form onSubmit={handleSubmit}>
+        <div className="mb-6">
+          <h2 className="text-xl font-bold mb-4">
+            {editId ? "Editar" : "Nuevo"} Usuario
+          </h2>
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
             <div>
               <label>Nombre:</label>
               <input
@@ -166,6 +173,7 @@ export const UsuariosPage = () => {
                   setFormData({ ...formData, nombre: e.target.value })
                 }
                 required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
             <div>
@@ -177,6 +185,7 @@ export const UsuariosPage = () => {
                   setFormData({ ...formData, correo: e.target.value })
                 }
                 required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
             <div>
@@ -189,6 +198,7 @@ export const UsuariosPage = () => {
                 }
                 required={!editId}
                 placeholder={editId ? "Dejar en blanco para no cambiar" : ""}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
             <div>
@@ -199,21 +209,32 @@ export const UsuariosPage = () => {
                   setFormData({ ...formData, rol: e.target.value })
                 }
                 required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="recepcion">Recepción</option>
                 <option value="medico">Médico</option>
                 <option value="admin">Administrador</option>
               </select>
             </div>
-            <button type="submit">Guardar</button>
-            <button type="button" onClick={handleCancelForm}>
-              Cancelar
-            </button>
+            <div className="md:col-span-2 flex gap-2">
+              <button
+                type="submit"
+                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              >
+                Guardar
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelForm}
+                className="bg-gray-400 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              >
+                Cancelar
+              </button>
+            </div>
           </form>
         </div>
       )}
-
-      <div>
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <input
           type="text"
           placeholder="Buscar usuarios..."
@@ -222,6 +243,7 @@ export const UsuariosPage = () => {
             setSearch(e.target.value);
             setPage(1);
           }}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
         />
         <select
           value={rolFilter}
@@ -229,6 +251,7 @@ export const UsuariosPage = () => {
             setRolFilter(e.target.value);
             setPage(1);
           }}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
         >
           <option value="">Todos los roles</option>
           <option value="admin">Administrador</option>
@@ -236,35 +259,55 @@ export const UsuariosPage = () => {
           <option value="recepcion">Recepción</option>
         </select>
       </div>
-
       {loading ? (
         <p>Cargando...</p>
       ) : (
-        <>
-          <table>
-            <thead>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+            <thead className="bg-green-500 text-white dark:bg-green-700">
               <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Rol</th>
-                {canManage && <th>Acciones</th>}
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  ID
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Nombre
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Correo
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Rol
+                </th>
+                {canManage && (
+                  <th className="px-4 py-3 text-left text-sm font-semibold">
+                    Acciones
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
               {usuarios.map((usuario) => (
-                <tr key={usuario.id}>
-                  <td>{usuario.id}</td>
-                  <td>{usuario.nombre}</td>
-                  <td>{usuario.correo}</td>
-                  <td>{usuario.rol}</td>
+                <tr
+                  key={usuario.id}
+                  className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                >
+                  <td className="px-4 py-3 text-sm">{usuario.id}</td>
+                  <td className="px-4 py-3 text-sm">{usuario.nombre}</td>
+                  <td className="px-4 py-3 text-sm">{usuario.correo}</td>
+                  <td className="px-4 py-3 text-sm">{usuario.rol}</td>
                   {canManage && (
-                    <td>
-                      <button onClick={() => handleEdit(usuario)}>
+                    <td className="px-4 py-3 text-sm">
+                      <button
+                        className="mr-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md"
+                        onClick={() => handleEdit(usuario)}
+                      >
                         Editar
                       </button>
                       {usuario.id !== user?.id && (
-                        <button onClick={() => handleDelete(usuario.id)}>
+                        <button
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"
+                          onClick={() => handleDelete(usuario.id)}
+                        >
                           Eliminar
                         </button>
                       )}
@@ -274,28 +317,29 @@ export const UsuariosPage = () => {
               ))}
             </tbody>
           </table>
-
-          {pagination && (
-            <div>
-              <button
-                disabled={!pagination.has_prev}
-                onClick={() => setPage(page - 1)}
-              >
-                Anterior
-              </button>
-              <span>
-                Página {pagination.current_page} de {pagination.total_pages}{" "}
-                (Total: {pagination.total})
-              </span>
-              <button
-                disabled={!pagination.has_next}
-                onClick={() => setPage(page + 1)}
-              >
-                Siguiente
-              </button>
-            </div>
-          )}
-        </>
+        </div>
+      )}
+      {pagination && (
+        <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-2">
+          <button
+            disabled={!pagination.has_prev}
+            onClick={() => setPage(page - 1)}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            Anterior
+          </button>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Página {pagination.current_page} de {pagination.total_pages} (Total:{" "}
+            {pagination.total})
+          </span>
+          <button
+            disabled={!pagination.has_next}
+            onClick={() => setPage(page + 1)}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            Siguiente
+          </button>
+        </div>
       )}
     </div>
   );
