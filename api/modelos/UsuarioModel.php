@@ -26,6 +26,26 @@ class UsuarioModel extends BaseModel
         return $result ? $result[0] : false;
     }
 
+    public function buscarByDatos($termino, $page = null, $perPage = null)
+    {
+        return parent::buscarByTermino(
+            $termino,
+            ['nombre', 'correo', 'rol'],
+            false,
+            [],
+            'nombre ASC',
+            [],
+            '*',
+            $page,
+            $perPage
+        );
+    }
+
+    public function getAllPaginated($page = 1, $perPage = 10, $conditions = [], $orderBy = 'nombre ASC')
+    {
+        return parent::getAllPaginated($page, $perPage, $conditions, $orderBy);
+    }
+
     public function verificarPassword($password, $passwordHash)
     {
         return password_verify($password, $passwordHash);

@@ -3,6 +3,11 @@
 require_once __DIR__ . '/../utilidades/Router.php';
 require_once __DIR__.'/rutaejemplo.php';
 require_once __DIR__.'/auth.php';
+require_once __DIR__.'/citas.php';
+require_once __DIR__.'/pacientes.php';
+require_once __DIR__.'/servicios.php';
+require_once __DIR__.'/usuarios.php';
+require_once __DIR__.'/medicos.php';
 
 function getAllRoutes()
 {
@@ -10,7 +15,12 @@ function getAllRoutes()
 
     $allRoutes = array_merge_recursive(
         getRutasEjemplo(),
-        getAuthRoutes()
+        getAuthRoutes(),
+        getCitasRoutes(),
+        getPacientesRoutes(),
+        getServiciosRoutes(),
+        getUsuariosRoutes(),
+        getMedicosRoutes()
     );
 
     return $allRoutes;

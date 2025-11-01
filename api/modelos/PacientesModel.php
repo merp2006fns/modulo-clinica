@@ -12,8 +12,13 @@ class PacientesModel extends BaseModel
         'fecha_registro'
     ];
 
-    public function buscarByDatos(string $termino)
+    public function buscarByDatos(string $termino, $page = null, $perPage = null)
     {
-        return $this->buscarByTermino($termino, ['nombre', 'telefono', 'correo']);
+        return $this->buscarByTermino($termino, ['nombre', 'telefono', 'correo'], false, [], '', [], '*', $page, $perPage);
+    }
+
+    public function getAllPaginated($page = 1, $perPage = 10, $conditions = [], $orderBy = 'nombre ASC')
+    {
+        return parent::getAllPaginated($page, $perPage, $conditions, $orderBy);
     }
 }
