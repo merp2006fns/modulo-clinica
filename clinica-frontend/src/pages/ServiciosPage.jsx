@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const API_URL = "http://localhost:8080";
@@ -20,11 +20,7 @@ export const ServiciosPage = () => {
 
   const canManage = user?.rol === "admin";
 
-  useEffect(() => {
-    fetchServicios();
-  }, [page, search]);
-
-  const fetchServicios = async () => {
+  const fetchServicios = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -51,7 +47,11 @@ export const ServiciosPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, search]);
+
+  useEffect(() => {
+    fetchServicios();
+  }, [page, search, fetchServicios]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -132,19 +132,26 @@ export const ServiciosPage = () => {
   };
 
   return (
-    <div>
+    <div className="container mx-auto px-2 sm:px-4 py-6">
       <h1>Gestión de Servicios</h1>
-
       {error && <p style={{ color: "red" }}>{error}</p>}
-
       {canManage && (
-        <button onClick={() => setShowForm(true)}>Nuevo Servicio</button>
+        <button
+          className="mb-4 w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+          onClick={() => setShowForm(true)}
+        >
+          Nuevo Servicio
+        </button>
       )}
-
       {showForm && canManage && (
-        <div>
-          <h2>{editId ? "Editar" : "Nuevo"} Servicio</h2>
-          <form onSubmit={handleSubmit}>
+        <div className="mb-6">
+          <h2 className="text-xl font-bold mb-4">
+            {editId ? "Editar" : "Nuevo"} Servicio
+          </h2>
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
             <div>
               <label>Nombre:</label>
               <input
@@ -154,6 +161,7 @@ export const ServiciosPage = () => {
                   setFormData({ ...formData, nombre: e.target.value })
                 }
                 required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
             <div>
@@ -167,17 +175,28 @@ export const ServiciosPage = () => {
                   setFormData({ ...formData, precio: e.target.value })
                 }
                 required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
-            <button type="submit">Guardar</button>
-            <button type="button" onClick={handleCancelForm}>
-              Cancelar
-            </button>
+            <div className="md:col-span-2 flex gap-2">
+              <button
+                type="submit"
+                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              >
+                Guardar
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelForm}
+                className="bg-gray-400 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              >
+                Cancelar
+              </button>
+            </div>
           </form>
         </div>
       )}
-
-      <div>
+      <div className="mb-6">
         <input
           type="text"
           placeholder="Buscar servicios..."
@@ -186,34 +205,53 @@ export const ServiciosPage = () => {
             setSearch(e.target.value);
             setPage(1);
           }}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
         />
       </div>
-
       {loading ? (
         <p>Cargando...</p>
       ) : (
-        <>
-          <table>
-            <thead>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+            <thead className="bg-green-500 text-white dark:bg-green-700">
               <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Precio</th>
-                {canManage && <th>Acciones</th>}
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  ID
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Nombre
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">
+                  Precio
+                </th>
+                {canManage && (
+                  <th className="px-4 py-3 text-left text-sm font-semibold">
+                    Acciones
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
               {servicios.map((servicio) => (
-                <tr key={servicio.id}>
-                  <td>{servicio.id}</td>
-                  <td>{servicio.nombre}</td>
-                  <td>${servicio.precio}</td>
+                <tr
+                  key={servicio.id}
+                  className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                >
+                  <td className="px-4 py-3 text-sm">{servicio.id}</td>
+                  <td className="px-4 py-3 text-sm">{servicio.nombre}</td>
+                  <td className="px-4 py-3 text-sm">${servicio.precio}</td>
                   {canManage && (
-                    <td>
-                      <button onClick={() => handleEdit(servicio)}>
+                    <td className="px-4 py-3 text-sm">
+                      <button
+                        className="mr-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md"
+                        onClick={() => handleEdit(servicio)}
+                      >
                         Editar
                       </button>
-                      <button onClick={() => handleDelete(servicio.id)}>
+                      <button
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"
+                        onClick={() => handleDelete(servicio.id)}
+                      >
                         Eliminar
                       </button>
                     </td>
@@ -222,28 +260,29 @@ export const ServiciosPage = () => {
               ))}
             </tbody>
           </table>
-
-          {pagination && (
-            <div>
-              <button
-                disabled={!pagination.has_prev}
-                onClick={() => setPage(page - 1)}
-              >
-                Anterior
-              </button>
-              <span>
-                Página {pagination.current_page} de {pagination.total_pages}{" "}
-                (Total: {pagination.total})
-              </span>
-              <button
-                disabled={!pagination.has_next}
-                onClick={() => setPage(page + 1)}
-              >
-                Siguiente
-              </button>
-            </div>
-          )}
-        </>
+        </div>
+      )}
+      {pagination && (
+        <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-2">
+          <button
+            disabled={!pagination.has_prev}
+            onClick={() => setPage(page - 1)}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            Anterior
+          </button>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Página {pagination.current_page} de {pagination.total_pages} (Total:{" "}
+            {pagination.total})
+          </span>
+          <button
+            disabled={!pagination.has_next}
+            onClick={() => setPage(page + 1)}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            Siguiente
+          </button>
+        </div>
       )}
     </div>
   );

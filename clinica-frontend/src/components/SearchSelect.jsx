@@ -10,6 +10,7 @@ export default function SearchSelect({
   minSearchLength = 2,
   debounceMs = 300,
   initialOptions = [],
+  enabled = true,
 }) {
   const [query, setQuery] = useState("");
   const [options, setOptions] = useState(initialOptions);
@@ -62,7 +63,7 @@ export default function SearchSelect({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={placeholder}
-        style={{ flex: 1 }}
+        disabled={!enabled}
       />
       <select
         name={name}
@@ -73,7 +74,7 @@ export default function SearchSelect({
             e.target.value === "" ? "" : Number(e.target.value);
           onChange(selectedId);
         }}
-        style={{ minWidth: 220 }}
+        disabled={!enabled}
       >
         <option value="">{loading ? "Cargando..." : "Selecciona"}</option>
         {options.map((opt) => (

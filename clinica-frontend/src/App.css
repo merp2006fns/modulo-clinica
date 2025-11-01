@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    font-family: "montserrat";
+  }
+
+  body {
+    @apply bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200 min-h-screen;
+  }
+
+  nav {
+    @apply bg-green-600 text-white shadow-md dark:bg-green-800;
+  }
+
+  nav > div:first-child {
+    @apply container mx-auto px-4 py-3 flex justify-between items-center;
+  }
+
+  nav h2 {
+    @apply text-xl font-bold;
+  }
+
+  nav ul {
+    @apply flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mt-4 md:mt-0;
+  }
+
+  nav a {
+    @apply text-white hover:text-green-200 transition-colors duration-200 py-2 px-3 rounded-md hover:bg-green-700 dark:hover:bg-green-900;
+  }
+
+  nav button {
+    @apply bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-md transition-colors duration-200;
+  }
+
+  form {
+    @apply space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md;
+  }
+
+  form div {
+    @apply space-y-2;
+  }
+
+  label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="date"],
+  input[type="datetime-local"],
+  select,
+  textarea {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white;
+  }
+
+  button:not(nav button) {
+    @apply bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:bg-green-700 dark:hover:bg-green-600;
+  }
+
+  table {
+    @apply w-full border-collapse bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden;
+  }
+
+  thead {
+    @apply bg-green-500 text-white dark:bg-green-700;
+  }
+
+  th {
+    @apply px-4 py-3 text-left text-sm font-semibold;
+  }
+
+  tbody tr {
+    @apply border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150;
+  }
+
+  td {
+    @apply px-4 py-3 text-sm;
+  }
+
+  h1 {
+    @apply text-3xl font-bold text-gray-900 dark:text-white mb-6;
+  }
+
+  h2 {
+    @apply text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4;
+  }
+
+  h3 {
+    @apply text-xl font-semibold text-gray-700 dark:text-gray-200 mb-3;
+  }
+
+  .search-select-container {
+    @apply space-y-2;
+  }
+
+  .search-select-container input {
+    @apply mb-2;
+  }
+
+  .pagination {
+    @apply flex justify-between items-center mt-6;
+  }
+
+  .pagination button {
+    @apply bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded disabled:bg-gray-400 disabled:cursor-not-allowed;
+  }
+
+  .pagination span {
+    @apply text-sm text-gray-600 dark:text-gray-400;
+  }
+
+  p[style="color: red"] {
+    @apply text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-md border border-red-200 dark:border-red-800;
+  }
+
+  p[style*="color: green"] {
+    @apply text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-md border border-green-200 dark:border-green-800;
+  }
+
+  .dashboard-section {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6;
+  }
+
+  .dashboard-section div {
+    @apply bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200;
+  }
+
+  .dashboard-section h3 a {
+    @apply text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      @apply px-4;
+    }
+
+    text table {
+      @apply text-sm;
+    }
+
+    th,
+    td {
+      @apply px-2 py-2;
+    }
+  }
+
+  div:has(> div:only-child:contains("Cargando...")) {
+    @apply flex justify-center items-center p-8;
+  }
+
+  div:has(> div:only-child:contains("Cargando...")) div {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+}
