@@ -4,11 +4,19 @@ require_once __DIR__ . '/../modelos/PacientesModel.php';
 require_once __DIR__ . '/../utilidades/Response.php';
 require_once __DIR__ . '/../utilidades/Auth.php';
 
+/**
+ * Controlador para gestionar operaciones CRUD de pacientes
+ * Maneja listado, búsqueda, creación, actualización y eliminación de pacientes
+ */
 class PacientesController extends BaseController
 {
     protected $modelClass = 'PacientesModel';
     protected $requiredFields = ['nombre', 'telefono', 'correo'];
 
+    /**
+     * Obtiene todos los pacientes con opciones de búsqueda y paginación
+     * @return JSON Lista de pacientes o resultados paginados/buscados
+     */
     public function getAll()
     {
         Auth::requiereAuth();
@@ -32,6 +40,10 @@ class PacientesController extends BaseController
         }
     }
 
+    /**
+     * Busca pacientes por término o obtiene lista limitada
+     * @return JSON Array de pacientes encontrados o lista limitada
+     */
     public function search()
     {
         Auth::requiereAuth();
@@ -68,6 +80,10 @@ class PacientesController extends BaseController
         }
     }
 
+    /**
+     * Crea un nuevo paciente (solo recepción y administradores)
+     * @return JSON Confirmación de creación con ID del nuevo paciente
+     */
     public function create()
     {
         Auth::requiereAuth();
@@ -105,6 +121,11 @@ class PacientesController extends BaseController
         }
     }
 
+    /**
+     * Actualiza un paciente existente (solo recepción y administradores)
+     * @param int $id ID del paciente a actualizar
+     * @return JSON Confirmación de actualización
+     */
     public function update($id)
     {
         Auth::requiereAuth();
@@ -143,6 +164,11 @@ class PacientesController extends BaseController
         }
     }
 
+    /**
+     * Elimina un paciente (solo administradores, previa verificación de citas asociadas)
+     * @param int $id ID del paciente a eliminar
+     * @return JSON Confirmación de eliminación
+     */
     public function delete($id)
     {
         Auth::requiereAdmin();

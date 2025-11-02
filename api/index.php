@@ -16,5 +16,3 @@ try {
 } catch (Exception $e) {
     Response::error('Error interno del servidor: ' . $e->getMessage(), 500);
 }
-
-// php -S localhost:8080 -t ../api

@@ -1,6 +1,10 @@
 <?php
 require_once __DIR__ . '/BaseModel.php';
 
+/**
+ * Modelo para gestionar las operaciones de la tabla citas
+ * Proporciona métodos específicos para citas con joins y búsquedas avanzadas
+ */
 class CitasModel extends BaseModel
 {
     protected $table = "citas";
@@ -14,6 +18,14 @@ class CitasModel extends BaseModel
         'notas'
     ];
 
+    /**
+     * Obtiene todas las citas con información de paciente, médico y servicio
+     * @param array $conditions Condiciones de filtrado
+     * @param string $orderBy Ordenamiento de resultados
+     * @param int|null $page Número de página para paginación
+     * @param int|null $perPage Registros por página
+     * @return array Citas con datos relacionados y paginación
+     */
     public function getAllWithJoin($conditions = [], $orderBy = 'c.fecha_hora DESC', $page = null, $perPage = null)
     {
         $joins = [
@@ -43,6 +55,16 @@ class CitasModel extends BaseModel
         return parent::getAllWithJoin($config);
     }
 
+    /**
+     * Busca citas por término en campos relacionados con joins
+     * @param string $termino Término de búsqueda
+     * @param bool $exacto Si la búsqueda debe ser exacta
+     * @param array $conditions Condiciones adicionales de filtrado
+     * @param string $orderBy Ordenamiento de resultados
+     * @param int|null $page Número de página para paginación
+     * @param int|null $perPage Registros por página
+     * @return array Citas encontradas con datos relacionados
+     */
     public function buscarByTerminoWithJoin($termino, $exacto = false, $conditions = [], $orderBy = 'c.fecha_hora DESC', $page = null, $perPage = null)
     {
         if (empty($termino)) {
@@ -82,6 +104,13 @@ class CitasModel extends BaseModel
         );
     }
 
+    /**
+     * Busca citas por nombre del paciente
+     * @param string $nombrePaciente Nombre o parte del nombre del paciente
+     * @param int|null $page Número de página para paginación
+     * @param int|null $perPage Registros por página
+     * @return array Citas del paciente encontradas
+     */
     public function buscarPorPaciente($nombrePaciente, $page = null, $perPage = null)
     {
         return $this->buscarByTerminoWithJoin(
@@ -94,6 +123,13 @@ class CitasModel extends BaseModel
         );
     }
 
+    /**
+     * Busca citas por nombre del médico
+     * @param string $nombreMedico Nombre o parte del nombre del médico
+     * @param int|null $page Número de página para paginación
+     * @param int|null $perPage Registros por página
+     * @return array Citas del médico encontradas
+     */
     public function buscarPorMedico($nombreMedico, $page = null, $perPage = null)
     {
         return $this->buscarByTerminoWithJoin(
@@ -106,6 +142,14 @@ class CitasModel extends BaseModel
         );
     }
 
+    /**
+     * Busca citas por término y fecha específica
+     * @param string $termino Término de búsqueda
+     * @param string|null $fecha Fecha específica para filtrar
+     * @param int|null $page Número de página para paginación
+     * @param int|null $perPage Registros por página
+     * @return array Citas encontradas ordenadas por fecha ascendente
+     */
     public function buscarCitasPorFechaYTermino($termino, $fecha = null, $page = null, $perPage = null)
     {
         $conditions = [];
@@ -123,6 +167,11 @@ class CitasModel extends BaseModel
         );
     }
 
+    /**
+     * Obtiene citas filtradas por múltiples criterios
+     * @param array $filtros Array con criterios de filtrado
+     * @return array Citas filtradas con datos relacionados
+     */
     public function getCitasFiltradas($filtros = [])
     {
         $conditions = [];
@@ -144,13 +193,21 @@ class CitasModel extends BaseModel
         }
 
         $orderBy = 'c.fecha_hora ' . ($filtros['orden'] ?? 'DESC');
-        
+
         $page = $filtros['page'] ?? null;
         $perPage = $filtros['per_page'] ?? null;
 
         return $this->getAllWithJoin($conditions, $orderBy, $page, $perPage);
     }
 
+    /**
+     * Obtiene citas paginadas con condiciones opcionales
+     * @param int $page Número de página
+     * @param int $perPage Registros por página
+     * @param array $conditions Condiciones de filtrado
+     * @param string $orderBy Ordenamiento de resultados
+     * @return array Citas paginadas con datos relacionados
+     */
     public function getAllPaginated($page = 1, $perPage = 10, $conditions = [], $orderBy = 'c.fecha_hora DESC')
     {
         return $this->getAllWithJoin($conditions, $orderBy, $page, $perPage);

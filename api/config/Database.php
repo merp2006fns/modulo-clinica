@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Clase singleton para gestionar la conexión a la base de datos
+ * Implementa el patrón Singleton para asegurar una única instancia de conexión
+ */
 class Database
 {
     private static $instance = null;
@@ -24,6 +29,10 @@ class Database
         }
     }
 
+    /**
+     * Obtiene la instancia única de la clase Database
+     * @return Database Instancia singleton de la base de datos
+     */
     public static function getInstance()
     {
         if (self::$instance === null) {
@@ -32,6 +41,10 @@ class Database
         return self::$instance;
     }
 
+    /**
+     * Obtiene la conexión PDO a la base de datos
+     * @return PDO Objeto de conexión PDO
+     */
     public function getConnection()
     {
         return $this->pdo;

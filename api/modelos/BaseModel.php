@@ -1,6 +1,10 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 
+/**
+ * Modelo base abstracto que proporciona operaciones CRUD básicas
+ * y métodos avanzados para consultas con joins, paginación y búsqueda
+ */
 abstract class BaseModel
 {
     protected $pdo;
@@ -13,6 +17,12 @@ abstract class BaseModel
         $this->pdo = $database->getConnection();
     }
 
+    /**
+     * Ejecuta una consulta SQL personalizada
+     * @param string $sql Consulta SQL a ejecutar
+     * @param array $params Parámetros para la consulta preparada
+     * @return array|bool Resultados para SELECT, true para otras consultas
+     */
     public function query($sql, $params = [])
     {
         try {
@@ -29,6 +39,12 @@ abstract class BaseModel
         }
     }
 
+    /**
+     * Obtiene todos los registros de la tabla con condiciones opcionales
+     * @param array $conditions Condiciones WHERE como array clave-valor
+     * @param string $orderBy Ordenamiento para los resultados
+     * @return array Array con todos los registros encontrados
+     */
     public function getAll($conditions = [], $orderBy = '')
     {
         $sql = "SELECT * FROM {$this->table}";
@@ -50,10 +66,18 @@ abstract class BaseModel
         return $this->query($sql, $params);
     }
 
+    /**
+     * Obtiene registros paginados con condiciones opcionales
+     * @param int $page Número de página
+     * @param int $perPage Cantidad de registros por página
+     * @param array $conditions Condiciones WHERE como array clave-valor
+     * @param string $orderBy Ordenamiento para los resultados
+     * @return array Datos paginados con información de paginación
+     */
     public function getAllPaginated($page = 1, $perPage = 10, $conditions = [], $orderBy = '')
     {
         $offset = ($page - 1) * $perPage;
-        
+
         $sql = "SELECT * FROM {$this->table}";
         $params = [];
 
@@ -85,7 +109,7 @@ abstract class BaseModel
             }
             $stmt->execute();
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             $total = $this->count($conditions);
             $totalPages = ceil($total / $perPage);
 
@@ -105,12 +129,22 @@ abstract class BaseModel
         }
     }
 
+    /**
+     * Obtiene un registro por su ID
+     * @param int $id ID del registro a buscar
+     * @return array|bool Array con datos del registro o false si no existe
+     */
     public function getById(int $id)
     {
         $result = $this->getAll(['id' => $id]);
         return $result ? $result[0] : false;
     }
 
+    /**
+     * Inserta un nuevo registro en la tabla
+     * @param array $data Datos del registro a insertar
+     * @return string ID del registro insertado
+     */
     public function insert(array $data)
     {
         $filtered_data = array_intersect_key($data, array_flip($this->campos));
@@ -133,6 +167,12 @@ abstract class BaseModel
         }
     }
 
+    /**
+     * Actualiza un registro por su ID
+     * @param int $id ID del registro a actualizar
+     * @param array $data Datos a actualizar
+     * @return bool True si se actualizó correctamente
+     */
     public function updateById(int $id, array $data)
     {
         $set_parts = [];
@@ -160,6 +200,11 @@ abstract class BaseModel
         }
     }
 
+    /**
+     * Elimina un registro por su ID
+     * @param int $id ID del registro a eliminar
+     * @return bool True si se eliminó correctamente
+     */
     public function deleteById(int $id)
     {
         $sql = "DELETE FROM {$this->table} WHERE id = :id";
@@ -173,6 +218,11 @@ abstract class BaseModel
         }
     }
 
+    /**
+     * Cuenta el total de registros que cumplen con las condiciones
+     * @param array $conditions Condiciones WHERE como array clave-valor
+     * @return int Número total de registros
+     */
     public function count($conditions = [])
     {
         $sql = "SELECT COUNT(*) as total FROM {$this->table}";
@@ -191,6 +241,11 @@ abstract class BaseModel
         return $result[0]['total'];
     }
 
+    /**
+     * Obtiene registros con joins entre tablas y paginación
+     * @param array $config Configuración para joins, condiciones, paginación, etc.
+     * @return array Datos con información de paginación si se solicita
+     */
     public function getAllWithJoin($config = [])
     {
         $defaultConfig = [
@@ -265,7 +320,7 @@ abstract class BaseModel
                 }
                 $stmt->execute();
                 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                
+
                 $countTableName = $config['tableAlias'] ? "{$this->table} {$config['tableAlias']}" : $this->table;
                 $countSql = "SELECT COUNT(*) as total FROM {$countTableName}";
                 foreach ($config['joins'] as $join) {
@@ -283,7 +338,7 @@ abstract class BaseModel
                 if ($config['groupBy']) {
                     $countSql = "SELECT COUNT(*) as total FROM (" . $countSql . ") as count_table";
                 }
-                
+
                 $countResult = $this->query($countSql, $countParams);
                 $total = $countResult[0]['total'] ?? 0;
                 $totalPages = ceil($total / $config['perPage']);
@@ -307,6 +362,20 @@ abstract class BaseModel
         return $this->query($sql, $params);
     }
 
+    /**
+     * Busca registros por término en múltiples campos con opciones avanzadas
+     * @param string $termino Término de búsqueda
+     * @param array $camposBusqueda Campos donde buscar el término
+     * @param bool $exacto Si la búsqueda debe ser exacta (true) o parcial (false)
+     * @param array $conditions Condiciones adicionales WHERE
+     * @param string $orderBy Ordenamiento de resultados
+     * @param array $joins Joins con otras tablas
+     * @param string $selectFields Campos a seleccionar
+     * @param int|null $page Número de página para paginación
+     * @param int|null $perPage Registros por página para paginación
+     * @param string|null $tableAlias Alias para la tabla principal
+     * @return array Datos encontrados con paginación si se solicita
+     */
     public function buscarByTermino($termino, $camposBusqueda = [], $exacto = false, $conditions = [], $orderBy = '', $joins = [], $selectFields = '*', $page = null, $perPage = null, $tableAlias = null)
     {
         if (empty($termino)) {
@@ -393,7 +462,7 @@ abstract class BaseModel
                 }
                 $stmt->execute();
                 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                
+
                 $countTableName = $tableAlias ? "{$this->table} {$tableAlias}" : $this->table;
                 $countSql = "SELECT COUNT(*) as total FROM {$countTableName}";
                 if (!empty($joins)) {
@@ -404,14 +473,14 @@ abstract class BaseModel
                 if (!empty($whereParts)) {
                     $countSql .= " WHERE " . implode(' AND ', $whereParts);
                 }
-                
+
                 $countParams = [];
                 foreach ($params as $key => $value) {
                     if ($key !== 'limit' && $key !== 'offset') {
                         $countParams[$key] = $value;
                     }
                 }
-                
+
                 $countResult = $this->query($countSql, $countParams);
                 $total = $countResult[0]['total'] ?? 0;
                 $totalPages = ceil($total / $perPage);

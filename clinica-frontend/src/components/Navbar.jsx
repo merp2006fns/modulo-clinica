@@ -19,7 +19,7 @@ export const Navbar = () => {
     <nav className="bg-green-600 text-white shadow-md dark:bg-green-800">
       <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center">
         <div className="flex flex-col items-center">
-          <h2 className="text-xl font-bold">Sistema de Clínica</h2>
+          <h2 className="text-xl font-bold text-white">Sistema de Clínica</h2>
           <p className="text-sm opacity-90">
             Usuario: {user?.nombre} ({user?.rol})
           </p>
