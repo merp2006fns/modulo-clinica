@@ -13,24 +13,8 @@
     @apply bg-green-600 text-white shadow-md dark:bg-green-800;
   }
 
-  nav > div:first-child {
-    @apply container mx-auto px-4 py-3 flex justify-between items-center;
-  }
-
-  nav h2 {
-    @apply text-xl font-bold;
-  }
-
-  nav ul {
-    @apply flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mt-4 md:mt-0;
-  }
-
   nav a {
     @apply text-white hover:text-green-200 transition-colors duration-200 py-2 px-3 rounded-md hover:bg-green-700 dark:hover:bg-green-900;
-  }
-
-  nav button {
-    @apply bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-md transition-colors duration-200;
   }
 
   form {
@@ -55,10 +39,6 @@
   select,
   textarea {
     @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white;
-  }
-
-  button:not(nav button) {
-    @apply bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:bg-green-700 dark:hover:bg-green-600;
   }
 
   table {
@@ -103,10 +83,6 @@
 
   .pagination {
     @apply flex justify-between items-center mt-6;
-  }
-
-  .pagination button {
-    @apply bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded disabled:bg-gray-400 disabled:cursor-not-allowed;
   }
 
   .pagination span {

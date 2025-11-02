@@ -181,14 +181,14 @@ export const ServiciosPage = () => {
             <div className="md:col-span-2 flex gap-2">
               <button
                 type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+                className="max-h-10 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
               >
                 Guardar
               </button>
               <button
                 type="button"
                 onClick={handleCancelForm}
-                className="bg-gray-400 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+                className="max-h-10 bg-gray-400 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
               >
                 Cancelar
               </button>
