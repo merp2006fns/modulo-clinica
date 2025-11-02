@@ -4,10 +4,19 @@ require_once __DIR__ . '/../modelos/UsuarioModel.php';
 require_once __DIR__ . '/../utilidades/Response.php';
 require_once __DIR__ . '/../utilidades/Auth.php';
 
+/**
+ * Controlador para gestionar operaciones relacionadas con médicos
+ * Proporciona búsqueda y consulta de usuarios con rol de médico
+ */
 class MedicosController extends BaseController
 {
     protected $modelClass = 'UsuarioModel';
 
+    /**
+     * Obtiene un médico específico por su ID
+     * @param int $id ID del médico a buscar
+     * @return JSON Datos del médico encontrado
+     */
     public function getById($id)
     {
         Auth::requiereAuth();
@@ -20,6 +29,10 @@ class MedicosController extends BaseController
         }
     }
 
+    /**
+     * Busca médicos por término o obtiene lista limitada
+     * @return JSON Lista de médicos filtrados por rol y término de búsqueda
+     */
     public function search()
     {
         Auth::requiereAuth();
@@ -31,7 +44,7 @@ class MedicosController extends BaseController
             if (empty($search) && $limit >= 1) {
                 $medicos = $this->model->getAll();
 
-                Response::json(array_slice($medicos,0,$limit));
+                Response::json(array_slice($medicos, 0, $limit));
                 return;
             }
 

@@ -4,15 +4,23 @@ require_once __DIR__ . '/../modelos/UsuarioModel.php';
 require_once __DIR__ . '/../utilidades/Response.php';
 require_once __DIR__ . '/../utilidades/Auth.php';
 
+/**
+ * Controlador para gestionar operaciones CRUD de usuarios
+ * Maneja listado, búsqueda, creación, actualización y eliminación de usuarios
+ */
 class UsuariosController extends BaseController
 {
     protected $modelClass = 'UsuarioModel';
     protected $requiredFields = ['nombre', 'correo', 'password', 'rol'];
 
+    /**
+     * Obtiene todos los usuarios con opciones de búsqueda, filtrado y paginación
+     * @return JSON Lista de usuarios o resultados de búsqueda
+     */
     public function getAll()
     {
         Auth::requiereAdmin();
-        
+
         try {
             $page = $_GET['page'] ?? null;
             $perPage = $_GET['per_page'] ?? null;
@@ -25,7 +33,7 @@ class UsuariosController extends BaseController
             }
 
             if (!empty($search)) {
-                $result = $this->model->buscarByDatos($search, $page, $perPage);
+                $result = $this->model->buscarByDatos($search, $page, $perPage, $conditions);
                 Response::json($result);
             } elseif ($page !== null && $perPage !== null) {
                 $result = $this->model->getAllPaginated((int)$page, (int)$perPage, $conditions);
@@ -42,23 +50,28 @@ class UsuariosController extends BaseController
         }
     }
 
+    /**
+     * Obtiene un usuario específico por su ID
+     * @param int $id ID del usuario a buscar
+     * @return JSON Datos del usuario sin contraseña
+     */
     public function getById($id)
     {
         Auth::requiereAuth();
-        
+
         try {
             $this->validateId($id);
 
             $rol = Auth::getRol();
             $usuarioId = Auth::getUsuarioId();
-            
+
             if ($rol !== 'admin' && (int)$id != $usuarioId) {
                 Response::error('No tienes permiso para ver este usuario', 403);
                 return;
             }
 
             $usuario = $this->model->getById((int)$id);
-            
+
             if ($usuario) {
                 unset($usuario['password']);
                 Response::json($usuario);
@@ -70,6 +83,10 @@ class UsuariosController extends BaseController
         }
     }
 
+    /**
+     * Crea un nuevo usuario en el sistema
+     * @return JSON Confirmación de creación con ID del nuevo usuario
+     */
     public function create()
     {
         Auth::requiereAdmin();
@@ -113,16 +130,21 @@ class UsuariosController extends BaseController
         }
     }
 
+    /**
+     * Actualiza un usuario existente
+     * @param int $id ID del usuario a actualizar
+     * @return JSON Confirmación de actualización
+     */
     public function update($id)
     {
         Auth::requiereAuth();
-        
+
         try {
             $this->validateId($id);
-            
+
             $rol = Auth::getRol();
             $usuarioId = Auth::getUsuarioId();
-            
+
             if ($rol !== 'admin' && (int)$id != $usuarioId) {
                 Response::error('No tienes permiso para actualizar este usuario', 403);
                 return;
@@ -170,13 +192,18 @@ class UsuariosController extends BaseController
         }
     }
 
+    /**
+     * Elimina un usuario del sistema
+     * @param int $id ID del usuario a eliminar
+     * @return JSON Confirmación de eliminación
+     */
     public function delete($id)
     {
         Auth::requiereAdmin();
 
         try {
             $this->validateId($id);
-            
+
             $usuarioId = Auth::getUsuarioId();
             if ((int)$id == $usuarioId) {
                 Response::error('No puedes eliminar tu propio usuario', 400);
@@ -186,14 +213,14 @@ class UsuariosController extends BaseController
             require_once __DIR__ . '/../modelos/CitasModel.php';
             $citasModel = new CitasModel();
             $citas = $citasModel->getAll(['medico_usuario_id' => $id]);
-            
+
             if (!empty($citas)) {
                 Response::error('No se puede eliminar el usuario porque tiene citas asociadas', 400);
                 return;
             }
 
             $success = $this->model->deleteById((int)$id);
-            
+
             if ($success) {
                 Response::json(['message' => 'Usuario eliminado exitosamente']);
             } else {
@@ -204,4 +231,3 @@ class UsuariosController extends BaseController
         }
     }
 }
-

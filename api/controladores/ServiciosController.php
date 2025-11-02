@@ -4,11 +4,19 @@ require_once __DIR__ . '/../modelos/ServiciosModel.php';
 require_once __DIR__ . '/../utilidades/Response.php';
 require_once __DIR__ . '/../utilidades/Auth.php';
 
+/**
+ * Controlador para gestionar operaciones CRUD de servicios médicos
+ * Maneja listado, búsqueda, creación, actualización y eliminación de servicios
+ */
 class ServiciosController extends BaseController
 {
     protected $modelClass = 'ServiciosModel';
     protected $requiredFields = ['nombre', 'precio'];
 
+    /**
+     * Obtiene todos los servicios con opciones de búsqueda y paginación
+     * @return JSON Lista de servicios o resultados paginados/buscados
+     */
     public function getAll()
     {
         Auth::requiereAuth();
@@ -32,6 +40,10 @@ class ServiciosController extends BaseController
         }
     }
 
+    /**
+     * Busca servicios por término o obtiene lista limitada
+     * @return JSON Array de servicios encontrados o lista limitada
+     */
     public function search()
     {
         Auth::requiereAuth();
@@ -43,7 +55,7 @@ class ServiciosController extends BaseController
             if (empty($search) && $limit >= 1) {
                 $servicios = $this->model->getAll();
 
-                Response::json(array_slice($servicios,0,$limit));
+                Response::json(array_slice($servicios, 0, $limit));
                 return;
             }
 
@@ -68,6 +80,10 @@ class ServiciosController extends BaseController
         }
     }
 
+    /**
+     * Crea un nuevo servicio médico (solo administradores)
+     * @return JSON Confirmación de creación con ID del nuevo servicio
+     */
     public function create()
     {
         Auth::requiereAdmin();
@@ -97,6 +113,11 @@ class ServiciosController extends BaseController
         }
     }
 
+    /**
+     * Actualiza un servicio existente (solo administradores)
+     * @param int $id ID del servicio a actualizar
+     * @return JSON Confirmación de actualización
+     */
     public function update($id)
     {
         Auth::requiereAdmin();
@@ -131,6 +152,11 @@ class ServiciosController extends BaseController
         }
     }
 
+    /**
+     * Elimina un servicio (solo administradores, previa verificación de citas asociadas)
+     * @param int $id ID del servicio a eliminar
+     * @return JSON Confirmación de eliminación
+     */
     public function delete($id)
     {
         Auth::requiereAdmin();

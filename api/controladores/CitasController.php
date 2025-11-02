@@ -4,11 +4,20 @@ require_once __DIR__ . '/../modelos/CitasModel.php';
 require_once __DIR__ . '/../utilidades/Response.php';
 require_once __DIR__ . '/../utilidades/Auth.php';
 
+/**
+ * Controlador para gestionar operaciones CRUD de citas médicas
+ * Maneja listado, búsqueda, creación, actualización y eliminación de citas
+ */
 class CitasController extends BaseController
 {
     protected $modelClass = 'CitasModel';
     protected $requiredFields = ['paciente_id', 'servicio_id', 'medico_usuario_id', 'fecha_hora'];
 
+    /**
+     * Obtiene todas las citas con opciones de filtrado, búsqueda y paginación
+     * Los médicos solo ven sus propias citas, admins ven todas
+     * @return JSON Lista de citas o resultados filtrados/buscados
+     */
     public function getAll()
     {
         Auth::requiereAuth();
@@ -34,7 +43,7 @@ class CitasController extends BaseController
             }
 
             $termino = $_GET['q'] ?? '';
-            
+
             $rol = Auth::getRol();
             if ($rol === 'medico') {
                 $filtros['medico_id'] = Auth::getUsuarioId();
@@ -44,7 +53,7 @@ class CitasController extends BaseController
                 $pageNum = $page !== null ? (int)$page : null;
                 $perPageNum = $perPage !== null ? (int)$perPage : null;
                 $conditions = [];
-                
+
                 if (!empty($filtros['estado'])) {
                     $conditions['c.estado'] = $filtros['estado'];
                 }
@@ -54,7 +63,7 @@ class CitasController extends BaseController
                 if (!empty($filtros['medico_id'])) {
                     $conditions['c.medico_usuario_id'] = $filtros['medico_id'];
                 }
-                
+
                 $data = $this->model->buscarByTerminoWithJoin(
                     $termino,
                     false,
@@ -83,13 +92,18 @@ class CitasController extends BaseController
         }
     }
 
+    /**
+     * Obtiene una cita específica por su ID con validación de permisos
+     * @param int $id ID de la cita a buscar
+     * @return JSON Datos completos de la cita con información relacionada
+     */
     public function getById($id)
     {
         Auth::requiereAuth();
         try {
             $this->validateId($id);
             $cita = $this->model->getById((int)$id);
-            
+
             if (!$cita) {
                 Response::error('Cita no encontrada', 404);
                 return;
@@ -118,10 +132,14 @@ class CitasController extends BaseController
         }
     }
 
+    /**
+     * Crea una nueva cita médica (solo recepción y administradores)
+     * @return JSON Confirmación de creación con ID de la nueva cita
+     */
     public function create()
     {
         Auth::requiereAuth();
-        
+
         $rol = Auth::getRol();
         if (!in_array($rol, ['recepcion', 'admin'])) {
             Response::error('No tienes permiso para crear citas', 403);
@@ -150,12 +168,17 @@ class CitasController extends BaseController
         }
     }
 
+    /**
+     * Actualiza una cita existente con validación de permisos y estados
+     * @param int $id ID de la cita a actualizar
+     * @return JSON Confirmación de actualización
+     */
     public function update($id)
     {
         Auth::requiereAuth();
         try {
             $this->validateId($id);
-            
+
             $cita = $this->model->getById((int)$id);
             if (!$cita) {
                 Response::error('Cita no encontrada', 404);
@@ -163,7 +186,7 @@ class CitasController extends BaseController
             }
 
             $rol = Auth::getRol();
-            
+
             if ($rol === 'medico' && $cita['medico_usuario_id'] != Auth::getUsuarioId()) {
                 Response::error('No tienes permiso para actualizar esta cita', 403);
                 return;
@@ -198,10 +221,15 @@ class CitasController extends BaseController
         }
     }
 
+    /**
+     * Elimina una cita (solo recepción y administradores)
+     * @param int $id ID de la cita a eliminar
+     * @return JSON Confirmación de eliminación
+     */
     public function delete($id)
     {
         Auth::requiereAuth();
-        
+
         $rol = Auth::getRol();
         if (!in_array($rol, ['recepcion', 'admin'])) {
             Response::error('No tienes permiso para eliminar citas', 403);
@@ -211,7 +239,7 @@ class CitasController extends BaseController
         try {
             $this->validateId($id);
             $success = $this->model->deleteById((int)$id);
-            
+
             if ($success) {
                 Response::json(['message' => 'Cita eliminada exitosamente']);
             } else {
@@ -222,6 +250,11 @@ class CitasController extends BaseController
         }
     }
 
+    /**
+     * Busca citas por término y fecha opcional
+     * Los médicos solo buscan en sus propias citas
+     * @return JSON Resultados de búsqueda con paginación
+     */
     public function buscar()
     {
         Auth::requiereAuth();
@@ -245,4 +278,3 @@ class CitasController extends BaseController
         }
     }
 }
-

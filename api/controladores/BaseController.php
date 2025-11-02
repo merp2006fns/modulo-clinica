@@ -1,6 +1,10 @@
 <?php
 require_once __DIR__ . '/../utilidades/Auth.php';
 
+/**
+ * Controlador base abstracto que proporciona operaciones CRUD básicas
+ * Define métodos comunes para todos los controladores con autenticación
+ */
 abstract class BaseController
 {
     protected $model;
@@ -15,6 +19,10 @@ abstract class BaseController
         }
     }
 
+    /**
+     * Obtiene todos los registros del modelo
+     * @return JSON Lista de todos los registros
+     */
     public function getAll()
     {
         Auth::requiereAuth();
@@ -30,6 +38,11 @@ abstract class BaseController
         }
     }
 
+    /**
+     * Obtiene un registro específico por su ID
+     * @param int $id ID del registro a buscar
+     * @return JSON Datos del registro encontrado
+     */
     public function getById($id)
     {
         Auth::requiereAuth();
@@ -47,6 +60,10 @@ abstract class BaseController
         }
     }
 
+    /**
+     * Crea un nuevo registro en la base de datos
+     * @return JSON Confirmación de creación con ID del nuevo registro
+     */
     public function create()
     {
         Auth::requiereAuth();
@@ -64,6 +81,11 @@ abstract class BaseController
         }
     }
 
+    /**
+     * Actualiza un registro existente por su ID
+     * @param int $id ID del registro a actualizar
+     * @return JSON Confirmación de actualización
+     */
     public function update($id)
     {
         Auth::requiereAuth();
@@ -82,6 +104,11 @@ abstract class BaseController
         }
     }
 
+    /**
+     * Elimina un registro por su ID (física o lógicamente)
+     * @param int $id ID del registro a eliminar
+     * @return JSON Confirmación de eliminación
+     */
     public function delete($id)
     {
         Auth::requiereAuth();
@@ -104,6 +131,10 @@ abstract class BaseController
         }
     }
 
+    /**
+     * Valida que el ID proporcionado sea numérico
+     * @param mixed $id ID a validar
+     */
     protected function validateId($id)
     {
         if (!is_numeric($id)) {
@@ -112,11 +143,19 @@ abstract class BaseController
         }
     }
 
+    /**
+     * Obtiene y decodifica los datos de entrada JSON
+     * @return array Datos decodificados del request
+     */
     protected function getInputData()
     {
         return json_decode(file_get_contents('php://input'), true) ?? [];
     }
 
+    /**
+     * Valida que todos los campos requeridos estén presentes en los datos
+     * @param array $data Datos a validar
+     */
     protected function validateRequiredFields($data)
     {
         foreach ($this->requiredFields as $field) {
@@ -127,21 +166,37 @@ abstract class BaseController
         }
     }
 
+    /**
+     * Mensaje para cuando no se encuentra un registro
+     * @return string Mensaje de error
+     */
     protected function getNotFoundMessage()
     {
         return 'Registro no encontrado';
     }
 
+    /**
+     * Mensaje para cuando se crea un registro exitosamente
+     * @return string Mensaje de confirmación
+     */
     protected function getCreatedMessage()
     {
         return 'Registro creado exitosamente';
     }
 
+    /**
+     * Mensaje para cuando se actualiza un registro exitosamente
+     * @return string Mensaje de confirmación
+     */
     protected function getUpdatedMessage()
     {
         return 'Registro actualizado exitosamente';
     }
 
+    /**
+     * Mensaje para cuando se elimina un registro exitosamente
+     * @return string Mensaje de confirmación
+     */
     protected function getDeletedMessage()
     {
         return 'Registro eliminado exitosamente';

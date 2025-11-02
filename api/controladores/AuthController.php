@@ -2,6 +2,10 @@
 require_once __DIR__ . '/../modelos/UsuarioModel.php';
 require_once __DIR__ . '/../utilidades/Auth.php';
 
+/**
+ * Controlador para manejar la autenticación y registro de usuarios
+ * Gestiona login, logout, verificación de sesión y registro de nuevos usuarios
+ */
 class AuthController
 {
     private $model;
@@ -14,6 +18,10 @@ class AuthController
         }
     }
 
+    /**
+     * Inicia sesión de usuario verificando credenciales
+     * @return JSON Respuesta con datos del usuario o error
+     */
     public function login()
     {
         try {
@@ -53,6 +61,10 @@ class AuthController
         }
     }
 
+    /**
+     * Cierra la sesión del usuario actual
+     * @return JSON Confirmación de cierre de sesión o error
+     */
     public function logout()
     {
         Auth::requiereAuth();
@@ -69,6 +81,10 @@ class AuthController
         }
     }
 
+    /**
+     * Verifica si existe una sesión activa y devuelve datos del usuario
+     * @return JSON Estado de la sesión y datos del usuario si está logueado
+     */
     public function verificarSesion()
     {
         try {
@@ -90,6 +106,10 @@ class AuthController
         }
     }
 
+    /**
+     * Registra un nuevo usuario (solo administradores)
+     * @return JSON Confirmación de registro o error
+     */
     public function registrarUsuario()
     {
         Auth::requiereAdmin();
